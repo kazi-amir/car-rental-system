@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once '../includes/session_manager.php';
+startSecureSession();
 require_once '../includes/db_connect.php';
 
 // Check if user is logged in and is customer
@@ -38,8 +39,16 @@ if (!$rental) {
 $start = new DateTime($rental['start_date']);
 $end = new DateTime($rental['end_date']);
 $today = new DateTime();
-$remaining_days = $today->diff($end)->days;
-$refund_amount = $remaining_days * $rental['price_per_day'] * 0.5;
+if ($today > $end) {
+    $remaining_days = 0;
+} elseif ($today < $start) {
+    // If cancellation before rental start, refund full rental days
+    $remaining_days = $start->diff($end)->days + 1;
+} else {
+    // Cancellation during rental period, refund remaining days including today
+    $remaining_days = $today->diff($end)->days + 1;
+}
+$refund_amount = max(0, $remaining_days) * $rental['price_per_day'] * 0.5;
 
 // Process cancellation
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,28 +56,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Start transaction
         $conn->beginTransaction();
         
-        // Update rental status
-        $stmt = $conn->prepare("UPDATE rentals SET status = 'cancelled' WHERE id = :id");
+        // Update rental status only if active
+        $stmt = $conn->prepare("UPDATE rentals SET status = 'cancelled' WHERE id = :id AND status = 'active'");
         $stmt->bindParam(':id', $rental_id);
         $stmt->execute();
+        
+        if ($stmt->rowCount() === 0) {
+            // No rows updated, rental might not be active
+            throw new Exception("Rental is not active or already cancelled.");
+        }
         
         // Make car available again
         $stmt = $conn->prepare("UPDATE cars SET available = TRUE WHERE id = :car_id");
         $stmt->bindParam(':car_id', $rental['car_id']);
         $stmt->execute();
         
-        // Refund to user balance
-        $stmt = $conn->prepare("UPDATE users SET balance = balance + :amount WHERE id = :user_id");
-        $stmt->bindParam(':amount', $refund_amount);
-        $stmt->bindParam(':user_id', $_SESSION['user_id']);
-        $stmt->execute();
-        
-        // Record transaction
-        $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, type, description) 
-                               VALUES (:user_id, :amount, 'credit', 'Rental cancellation refund')");
-        $stmt->bindParam(':user_id', $_SESSION['user_id']);
-        $stmt->bindParam(':amount', $refund_amount);
-        $stmt->execute();
+        // Refund to user balance only if refund amount > 0
+        if ($refund_amount > 0) {
+            $stmt = $conn->prepare("UPDATE users SET balance = balance + :amount WHERE id = :user_id");
+            $stmt->bindParam(':amount', $refund_amount);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            
+            // Record transaction
+            $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, type, description) 
+                                   VALUES (:user_id, :amount, 'credit', 'Rental cancellation refund')");
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->bindParam(':amount', $refund_amount);
+            $stmt->execute();
+        }
         
         // Commit transaction
         $conn->commit();
@@ -98,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         header("Location: my_rentals.php?success=rental_cancelled&refund=" . urlencode(number_format($refund_amount, 2)));
         exit();
-    } catch(PDOException $e) {
+    } catch(Exception $e) {
         $conn->rollBack();
         file_put_contents('debug.log', "Cancellation failed: " . $e->getMessage() . "\n", FILE_APPEND);
         header("Location: my_rentals.php?error=cancel_failed&details=" . urlencode($e->getMessage()));

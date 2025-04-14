@@ -45,25 +45,29 @@ $balance = $user['balance'];
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php
                     $stmt = $conn->query("SELECT * FROM cars WHERE available = TRUE ORDER BY price_per_day ASC");
-                    while ($car = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        echo '<div class="border rounded-lg overflow-hidden">';
-                        echo '<div class="bg-gray-200 h-48 flex items-center justify-center">';
-                        if ($car['image_path']) {
-                            echo '<img src="../' . $car['image_path'] . '" alt="' . $car['make'] . ' ' . $car['model'] . '" class="h-full object-cover">';
-                        } else {
-                            echo '<i class="fas fa-car text-6xl text-gray-400"></i>';
+                    if ($stmt->rowCount() === 0) {
+                        echo '<p class="text-gray-600">No cars available at the moment.</p>';
+                    } else {
+                        while ($car = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo '<div class="border rounded-lg overflow-hidden">';
+                            echo '<div class="bg-gray-200 h-48 flex items-center justify-center">';
+                            if ($car['image_path']) {
+                                echo '<img src="../' . $car['image_path'] . '" alt="' . $car['make'] . ' ' . $car['model'] . '" class="h-full object-cover">';
+                            } else {
+                                echo '<i class="fas fa-car text-6xl text-gray-400"></i>';
+                            }
+                            echo '</div>';
+                            echo '<div class="p-4">';
+                            echo '<h3 class="font-bold text-lg">' . $car['make'] . ' ' . $car['model'] . '</h3>';
+                            echo '<p class="text-gray-600 text-sm">' . $car['year'] . ' • ' . $car['color'] . '</p>';
+                            echo '<p class="mt-2 text-lg font-bold">$' . number_format($car['price_per_day'], 2) . '<span class="text-sm font-normal text-gray-600"> / day</span></p>';
+                            echo '<div class="mt-4 flex justify-between items-center">';
+                            echo '<a href="rent_car.php?id=' . $car['id'] . '" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">Rent Now</a>';
+                            echo '<a href="car_details.php?id=' . $car['id'] . '" class="text-blue-500 hover:underline">Details</a>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
                         }
-                        echo '</div>';
-                        echo '<div class="p-4">';
-                        echo '<h3 class="font-bold text-lg">' . $car['make'] . ' ' . $car['model'] . '</h3>';
-                        echo '<p class="text-gray-600 text-sm">' . $car['year'] . ' • ' . $car['color'] . '</p>';
-                        echo '<p class="mt-2 text-lg font-bold">$' . number_format($car['price_per_day'], 2) . '<span class="text-sm font-normal text-gray-600"> / day</span></p>';
-                        echo '<div class="mt-4 flex justify-between items-center">';
-                        echo '<a href="rent_car.php?id=' . $car['id'] . '" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">Rent Now</a>';
-                        echo '<a href="car_details.php?id=' . $car['id'] . '" class="text-blue-500 hover:underline">Details</a>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</div>';
                     }
                     ?>
                 </div>

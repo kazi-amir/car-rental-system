@@ -62,6 +62,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             </nav>
         </div>
 
+        <?php if (basename($_SERVER['SCRIPT_NAME']) === 'dashboard.php'): ?>
         <!-- Main Content -->
         <div class="flex-1 p-8">
             <div class="flex justify-between items-center mb-8">
@@ -159,6 +160,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>

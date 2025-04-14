@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Calculate days and total price
     $start = new DateTime($start_date);
     $end = new DateTime($end_date);
-    $days = $start->diff($end)->days;
+    $days = $start->diff($end)->days + 1;
     $total_price = $days * $car['price_per_day'];
     
     // Check if user has enough balance
@@ -206,7 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function calculatePrice() {
             const start = new Date(startDate.selectedDates[0]);
             const end = new Date(endDate.selectedDates[0]);
-            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
             const pricePerDay = <?php echo $car['price_per_day']; ?>;
             const total = (days + 1) * pricePerDay;
             

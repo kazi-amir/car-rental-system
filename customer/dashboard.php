@@ -69,6 +69,7 @@ $balance = $user['balance'];
             </nav>
         </div>
 
+        <?php if (basename($_SERVER['SCRIPT_NAME']) === 'dashboard.php'): ?>
         <!-- Main Content -->
         <div class="flex-1 p-8">
             <div class="flex justify-between items-center mb-8">
@@ -144,6 +145,7 @@ $balance = $user['balance'];
                 ?>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>

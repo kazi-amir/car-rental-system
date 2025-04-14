@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once '../includes/session_manager.php';
+startSecureSession();
 require_once '../includes/db_connect.php';
 
 // Check if user is logged in and is customer
@@ -19,7 +20,7 @@ $rental_id = $_GET['id'];
 // Get rental details
 $stmt = $conn->prepare("
     SELECT r.*, c.make, c.model, c.year, c.color, c.price_per_day, 
-           u.username, u.email, u.phone
+           u.username, u.email
     FROM rentals r
     JOIN cars c ON r.car_id = c.id
     JOIN users u ON r.user_id = u.id
@@ -38,7 +39,7 @@ if (!$rental) {
 // Calculate days
 $start = new DateTime($rental['start_date']);
 $end = new DateTime($rental['end_date']);
-$days = $start->diff($end)->days;
+$days = $start->diff($end)->days + 1;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +96,6 @@ $days = $start->diff($end)->days;
                         <h3 class="text-lg font-bold mb-2">Customer Information</h3>
                         <p class="font-medium"><?php echo $rental['username']; ?></p>
                         <p class="text-gray-600"><?php echo $rental['email']; ?></p>
-                        <p class="text-gray-600"><?php echo $rental['phone'] ?? 'N/A'; ?></p>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold mb-2">Rental Information</h3>
@@ -120,11 +120,8 @@ $days = $start->diff($end)->days;
                     <h3 class="text-lg font-bold mb-4">Car Information</h3>
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="bg-gray-200 h-48 w-64 flex items-center justify-center rounded-lg">
-                            <?php if ($rental['image_path']): ?>
-                                <img src="../<?php echo $rental['image_path']; ?>" alt="<?php echo $rental['make'] . ' ' . $rental['model']; ?>" class="h-full object-cover">
-                            <?php else: ?>
-                                <i class="fas fa-car text-6xl text-gray-400"></i>
-                            <?php endif; ?>
+                            <!-- Car image excluded as per request -->
+                            <i class="fas fa-car text-6xl text-gray-400"></i>
                         </div>
                         <div>
                             <h4 class="text-xl font-bold"><?php echo $rental['make'] . ' ' . $rental['model']; ?></h4>
