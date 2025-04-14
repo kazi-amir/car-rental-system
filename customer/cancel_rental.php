@@ -10,7 +10,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
 
 // Check if rental ID is provided
 if (!isset($_GET['id'])) {
-    header("Location: my_rentals.php");
+    file_put_contents('debug.log', "No rental ID provided\n", FILE_APPEND);
+    header("Location: my_rentals.php?error=no_rental_id");
     exit();
 }
 
@@ -72,11 +73,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Commit transaction
         $conn->commit();
         
-        header("Location: my_rentals.php?success=rental_cancelled");
+        // Send email notification
+        $user_stmt = $conn->prepare("SELECT email, username FROM users WHERE id = :user_id");
+        $user_stmt->bindParam(':user_id', $_SESSION['user_id']);
+        $user_stmt->execute();
+        $user = $user_stmt->fetch();
+        
+        $to = $user['email'];
+        $subject = "Your Rental #$rental_id Has Been Cancelled";
+        $message = "
+            <h2>Rental Cancellation Confirmation</h2>
+            <p>Hello {$user['username']},</p>
+            <p>Your rental #$rental_id has been successfully cancelled.</p>
+            <p><strong>Refund Amount:</strong> $" . number_format($refund_amount, 2) . "</p>
+            <p>The refund has been credited to your account balance.</p>
+            <p>Thank you for using our service.</p>
+        ";
+        
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: no-reply@carrentalsystem.com\r\n";
+        
+        mail($to, $subject, $message, $headers);
+        
+        header("Location: my_rentals.php?success=rental_cancelled&refund=" . urlencode(number_format($refund_amount, 2)));
         exit();
     } catch(PDOException $e) {
         $conn->rollBack();
-        header("Location: my_rentals.php?error=cancel_failed");
+        file_put_contents('debug.log', "Cancellation failed: " . $e->getMessage() . "\n", FILE_APPEND);
+        header("Location: my_rentals.php?error=cancel_failed&details=" . urlencode($e->getMessage()));
         exit();
     }
 }
@@ -154,9 +179,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="flex justify-end space-x-4">
                         <a href="my_rentals.php" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Cancel</a>
-                        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            Confirm Cancellation
-                        </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            onclick="return confirm('Are you sure you want to cancel this rental? You will receive a 50% refund for remaining days.')">
+                        Confirm Cancellation
+                    </button>
                     </div>
                 </form>
             </div>

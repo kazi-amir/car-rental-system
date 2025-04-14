@@ -1,0 +1,2 @@
+Cancellation failed: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'car_rental.transactions' doesn't exist
+Cancellation failed: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'car_rental.transactions' doesn't exist

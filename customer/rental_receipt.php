@@ -46,8 +46,9 @@ $days = $start->diff($end)->days;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rental Receipt - Car Rental System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/car-rental-system/assets/css/tailwind.css">
+    <link rel="stylesheet" href="/car-rental-system/assets/css/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/car-rental-system/assets/css/fonts/inter.css">
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen">
@@ -62,9 +63,14 @@ $days = $start->diff($end)->days;
                     <a href="my_rentals.php" class="text-blue-500 hover:underline">
                         <i class="fas fa-arrow-left mr-1"></i> Back to My Rentals
                     </a>
-                    <button onclick="window.print()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <button onclick="window.print()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">
                         <i class="fas fa-print mr-1"></i> Print
                     </button>
+                    <?php if ($rental['status'] == 'active'): ?>
+                    <a href="cancel_rental.php?id=<?= $rental['id'] ?>" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        <i class="fas fa-times mr-1"></i> Cancel Rental
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
 

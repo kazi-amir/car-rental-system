@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const end = new Date(endDate.selectedDates[0]);
             const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
             const pricePerDay = <?php echo $car['price_per_day']; ?>;
-            const total = days * pricePerDay;
+            const total = (days + 1) * pricePerDay;
             
             document.getElementById('price_estimate').textContent = '$' + total.toFixed(2);
         }
