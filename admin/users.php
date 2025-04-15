@@ -102,12 +102,12 @@ if (isset($_GET['delete'])) {
                             $stmt = $conn->query("SELECT id, username, email, role, balance FROM users ORDER BY id DESC");
                             while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<tr>";
-                                echo "<td class='py-2 px-4 border-b'>{$user['id']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>" . htmlspecialchars($user['username']) . "</td>";
-                                echo "<td class='py-2 px-4 border-b'>" . htmlspecialchars($user['email']) . "</td>";
-                                echo "<td class='py-2 px-4 border-b'>" . htmlspecialchars($user['role']) . "</td>";
-                                echo "<td class='py-2 px-4 border-b'>$" . number_format($user['balance'], 2) . "</td>";
-                                echo "<td class='py-2 px-4 border-b'>
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$user['id']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>" . htmlspecialchars($user['username']) . "</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>" . htmlspecialchars($user['email']) . "</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>" . htmlspecialchars($user['role']) . "</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>$" . number_format($user['balance'], 2) . "</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>
                                         <a href='edit_user.php?id={$user['id']}' class='text-blue-500 hover:text-blue-700 mr-2'>
                                             <i class='fas fa-edit'></i>
                                         </a>

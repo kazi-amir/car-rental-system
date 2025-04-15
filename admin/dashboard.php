@@ -125,12 +125,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     <table class="min-w-full bg-white">
                         <thead>
                             <tr>
-                                <th class="py-2 px-4 border-b">ID</th>
-                                <th class="py-2 px-4 border-b">User</th>
-                                <th class="py-2 px-4 border-b">Car</th>
-                                <th class="py-2 px-4 border-b">Dates</th>
-                                <th class="py-2 px-4 border-b">Price</th>
-                                <th class="py-2 px-4 border-b">Status</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>ID</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>User</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>Car</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>Dates</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>Price</th>
+                                <th class="py-2 px-4 border-b" style='text-align: center'>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,12 +146,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             ");
                             while ($rental = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<tr>";
-                                echo "<td class='py-2 px-4 border-b'>{$rental['id']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$rental['username']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$rental['car']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$rental['start_date']} to {$rental['end_date']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>\${$rental['total_price']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$rental['status']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['id']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['username']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['car']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['start_date']} to {$rental['end_date']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>\${$rental['total_price']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['status']}</td>";
                                 echo "</tr>";
                             }
                             ?>

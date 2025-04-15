@@ -81,7 +81,7 @@ if (isset($_GET['delete'])) {
                     <table class="min-w-full bg-white">
                         <thead>
                             <tr>
-                                <th class="py-2 px-4 border-b">ID</th>
+                                <th class="py-2 px-4 border-b" style="text-align: center">ID</th>
                                 <th class="py-2 px-4 border-b">Make</th>
                                 <th class="py-2 px-4 border-b">Model</th>
                                 <th class="py-2 px-4 border-b">Year</th>
@@ -96,14 +96,14 @@ if (isset($_GET['delete'])) {
                             $stmt = $conn->query("SELECT * FROM cars ORDER BY id DESC");
                             while ($car = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<tr>";
-                                echo "<td class='py-2 px-4 border-b'>{$car['id']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$car['make']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$car['model']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$car['year']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>{$car['color']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>\${$car['price_per_day']}</td>";
-                                echo "<td class='py-2 px-4 border-b'>" . ($car['available'] ? 'Available' : 'Rented') . "</td>";
-                                echo "<td class='py-2 px-4 border-b'>
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$car['id']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$car['make']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$car['model']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$car['year']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$car['color']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>\${$car['price_per_day']}</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>" . ($car['available'] ? 'Available' : 'Rented') . "</td>";
+                                echo "<td class='py-2 px-4 border-b' style='text-align: center'>
                                         <a href='edit_car.php?id={$car['id']}' class='text-blue-500 hover:text-blue-700 mr-2'>
                                             <i class='fas fa-edit'></i>
                                         </a>

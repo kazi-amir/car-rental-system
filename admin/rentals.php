@@ -26,7 +26,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         </div>
 
         <!-- Main Content -->
-        <div id="main-content" class="flex-1 p-8 transition-all duration-300">
+        <div id="main-content" class="flex-1 p-8 transition-all duration-300 overflow-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-bold text-gray-800">Rental History</h2>
                 <button id="toggleSidebar" class="md:hidden bg-blue-500 text-white px-3 py-1 rounded">
@@ -36,16 +36,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
             <div class="bg-white p-6 rounded-lg shadow">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white">
+                    <table class="min-w-full bg-white border border-gray-200">
                         <thead>
-                            <tr>
-                                <th class="py-2 px-4 border-b">Rental ID</th>
-                                <th class="py-2 px-4 border-b">User</th>
-                                <th class="py-2 px-4 border-b">Car</th>
-                                <th class="py-2 px-4 border-b">Dates</th>
-                                <th class="py-2 px-4 border-b">Price</th>
-                                <th class="py-2 px-4 border-b">Status</th>
-                                <th class="py-2 px-4 border-b">Actions</th>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">Rental ID</th>
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">User</th>
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">Car</th>
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">Dates</th>
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">Price</th>
+                                <th class="py-2 px-4 border-b border-gray-300 text-left" style="text-align: center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,12 +62,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             if ($stmt->rowCount() > 0) {
                                 while ($rental = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<tr>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['id']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>" . htmlspecialchars($rental['username']) . "</td>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['make']} {$rental['model']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['start_date']} to {$rental['end_date']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>$" . number_format($rental['total_price'], 2) . "</td>";
-                                    echo "<td class='py-2 px-4 border-b'>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>{$rental['id']}</td>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>" . htmlspecialchars($rental['username']) . "</td>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>{$rental['make']} {$rental['model']}</td>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>{$rental['start_date']} to {$rental['end_date']}</td>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>$" . number_format($rental['total_price'], 2) . "</td>";
+                                    echo "<td class='py-2 px-4 border-b border-gray-300' style='text-align: center'>";
                                     echo "<span class='px-2 py-1 rounded-full text-xs ";
                                     switch($rental['status']) {
                                         case 'active':
@@ -80,15 +79,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                                         case 'cancelled':
                                             echo "bg-red-100 text-red-800";
                                             break;
+                                        default:
+                                            echo "bg-gray-100 text-gray-800";
                                     }
                                     echo "'>" . htmlspecialchars($rental['status']) . "</span>";
-                                    echo "</td>";
-                                    echo "<td class='py-2 px-4 border-b'>";
-                                    echo "<a href='../customer/rental_receipt.php?id={$rental['id']}' 
-                                          class='text-blue-500 hover:text-blue-700' target='_blank'>
-                                          <i class='fas fa-receipt'></i> Receipt
-                                          </a>";
-                                    echo "</td>";
                                     echo "</tr>";
                                 }
                             } else {
@@ -117,10 +111,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
             }
         });
 
-        // Hide sidebar by default on small screens or if not dashboard page
-        if (window.innerWidth < 768 || window.location.pathname.indexOf('dashboard.php') === -1) {
-            sidebar.style.transform = 'translateX(-100%)';
-        }
     </script>
 </body>
 </html>

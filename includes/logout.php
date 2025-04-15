@@ -2,10 +2,8 @@
 require_once 'session_manager.php';
 startSecureSession();
 
-// Unset all session variables
 $_SESSION = array();
 
-// Delete session cookie
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -19,13 +17,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Destroy the session
 session_destroy();
 
-// Prevent session fixation
 session_regenerate_id(true);
 
-// Redirect to login page
 header("Location: ../login.php");
 exit();
 ?>

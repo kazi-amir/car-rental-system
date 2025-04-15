@@ -82,11 +82,11 @@ $balance = $user['balance'];
                             if ($stmt->rowCount() > 0) {
                                 while ($rental = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     echo "<tr>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['id']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['make']} {$rental['model']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>{$rental['start_date']} to {$rental['end_date']}</td>";
-                                    echo "<td class='py-2 px-4 border-b'>$" . number_format($rental['total_price'], 2) . "</td>";
-                                    echo "<td class='py-2 px-4 border-b'>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['id']}</td>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['make']} {$rental['model']}</td>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$rental['start_date']} to {$rental['end_date']}</td>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>$" . number_format($rental['total_price'], 2) . "</td>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>";
                                     echo "<span class='px-2 py-1 rounded-full text-xs ";
                                     switch($rental['status']) {
                                         case 'active':
@@ -101,7 +101,7 @@ $balance = $user['balance'];
                                     }
                                     echo "'>{$rental['status']}</span>";
                                     echo "</td>";
-                                    echo "<td class='py-2 px-4 border-b'>";
+                                    echo "<td class='py-2 px-4 border-b' style='text-align: center'>";
                                     if ($rental['status'] === 'active') {
                                         echo "<a href='cancel_rental.php?id={$rental['id']}' 
                                               class='text-red-500 hover:text-red-700 mr-2'
@@ -109,11 +109,6 @@ $balance = $user['balance'];
                                               <i class='fas fa-times'></i> Cancel
                                           </a>";
                                     }
-                                    echo "<a href='rental_receipt.php?id={$rental['id']}' 
-                                          class='text-blue-500 hover:text-blue-700'>
-                                          <i class='fas fa-receipt'></i> Receipt
-                                      </a>";
-                                    echo "</td>";
                                     echo "</tr>";
                                 }
                             } else {
