@@ -29,7 +29,7 @@ $balance = $user['balance'];
         <div class="bg-blue-800 text-white w-64 p-4">
             <div class="flex items-center space-x-2 mb-8">
                 <i class="fas fa-car text-2xl"></i>
-                <a href="../customers/dashboard.php"><h1 class="text-xl font-bold">Car Rental</h1></a>
+                <a href="../customer/dashboard.php"><h1 class="text-xl font-bold">Car Rental</h1></a>
             </div>
             <nav>
                 <ul class="space-y-2">

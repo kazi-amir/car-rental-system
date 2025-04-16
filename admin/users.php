@@ -15,6 +15,16 @@ if (isset($_GET['delete'])) {
             header("Location: users.php?error=cannot_delete_self");
             exit();
         }
+
+        $stmt2 = $conn->prepare("SELECT * FROM users WHERE username='admin' AND email='admin@carrental.com'");
+        $stmt2->execute();
+        $adm = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+        if(!$adm || $adm['id'] === 1){
+            header("Location: users.php?error=cannot_delete_admin");
+            exit();
+        }
+        
         $stmt = $conn->prepare("DELETE FROM users WHERE id = :id");
         $stmt->bindParam(':id', $user_id);
         $stmt->execute();
@@ -72,6 +82,9 @@ if (isset($_GET['delete'])) {
                         switch($_GET['error']) {
                             case 'cannot_delete_self':
                                 echo 'You cannot delete your own account';
+                                break;
+                            case 'cannot_delete_admin':
+                                echo 'You cannot delete this account';
                                 break;
                             case 'delete_failed':
                                 echo 'Failed to delete user';
