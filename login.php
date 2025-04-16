@@ -42,5 +42,8 @@
             </div>
         </div>
     </div>
+    <div style="text-align:center">
+        <?php include 'includes/footer.php';?>
+    </div>
 </body>
 </html>
