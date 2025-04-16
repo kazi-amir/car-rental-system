@@ -2,13 +2,11 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Check if car ID is provided
 if (!isset($_GET['id'])) {
     header("Location: available_cars.php");
     exit();
@@ -16,7 +14,6 @@ if (!isset($_GET['id'])) {
 
 $car_id = $_GET['id'];
 
-// Get car details
 $stmt = $conn->prepare("SELECT * FROM cars WHERE id = :id AND available = TRUE");
 $stmt->bindParam(':id', $car_id);
 $stmt->execute();
@@ -27,35 +24,30 @@ if (!$car) {
     exit();
 }
 
-// Get user balance
 $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $balance = $user['balance'];
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
     
-    // Calculate days and total price
     $start = new DateTime($start_date);
     $end = new DateTime($end_date);
     $days = $start->diff($end)->days + 1;
     $total_price = $days * $car['price_per_day'];
     
-    // Check if user has enough balance
     if ($balance < $total_price) {
         header("Location: rent_car.php?id=$car_id&error=insufficient_balance");
         exit();
     }
     
     try {
-        // Start transaction
+        
         $conn->beginTransaction();
         
-        // Create rental record
         $stmt = $conn->prepare("INSERT INTO rentals (user_id, car_id, start_date, end_date, total_price) 
                                VALUES (:user_id, :car_id, :start_date, :end_date, :total_price)");
         $stmt->bindParam(':user_id', $_SESSION['user_id']);
@@ -65,18 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':total_price', $total_price);
         $stmt->execute();
         
-        // Update car availability
         $stmt = $conn->prepare("UPDATE cars SET available = FALSE WHERE id = :id");
         $stmt->bindParam(':id', $car_id);
         $stmt->execute();
         
-        // Deduct from user balance
         $stmt = $conn->prepare("UPDATE users SET balance = balance - :amount WHERE id = :id");
         $stmt->bindParam(':amount', $total_price);
         $stmt->bindParam(':id', $_SESSION['user_id']);
         $stmt->execute();
         
-        // Commit transaction
         $conn->commit();
         
         header("Location: my_rentals.php?success=car_rented");
@@ -181,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Initialize date pickers
+        
         const startDate = flatpickr("#start_date", {
             minDate: "today",
             dateFormat: "Y-m-d",
@@ -202,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
-        // Calculate rental price
+
         function calculatePrice() {
             const start = new Date(startDate.selectedDates[0]);
             const end = new Date(endDate.selectedDates[0]);

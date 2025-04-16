@@ -3,12 +3,12 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,11 +50,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                         <tbody>
                             <?php
                             $stmt = $conn->prepare("
-                                SELECT r.id, u.username, c.make, c.model, r.start_date, r.end_date, 
-                                       r.total_price, r.status, r.created_at
+                                SELECT r.id, u.username, c.make, c.model, r.start_date, r.end_date, r.total_price, r.status, r.created_at
                                 FROM rentals r
-                                JOIN users u ON r.user_id = u.id
-                                JOIN cars c ON r.car_id = c.id
+                                INNER JOIN cars c ON r.car_id=c.id
+                                INNER JOIN users u ON r.user_id=u.id
                                 ORDER BY r.created_at DESC
                             ");
                             $stmt->execute();

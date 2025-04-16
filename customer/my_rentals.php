@@ -2,13 +2,11 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Get user balance
 $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
 $stmt->execute();

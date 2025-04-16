@@ -3,13 +3,11 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Get user balance
 $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
 $stmt->execute();
@@ -93,7 +91,6 @@ $balance = $user['balance'];
                     JOIN cars c ON r.car_id = c.id
                     WHERE r.user_id = :user_id AND r.status = 'active'
                     ORDER BY r.start_date DESC
-                    LIMIT 3
                 ");
                 $stmt->bindParam(':user_id', $_SESSION['user_id']);
                 $stmt->execute();
@@ -124,8 +121,7 @@ $balance = $user['balance'];
                 $stmt = $conn->query("
                     SELECT * FROM cars 
                     WHERE available = TRUE 
-                    ORDER BY id DESC 
-                    LIMIT 3
+                    ORDER BY id DESC
                 ");
 
                 if ($stmt->rowCount() > 0) {

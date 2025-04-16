@@ -3,17 +3,14 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Handle user deletion
 if (isset($_GET['delete'])) {
     $user_id = $_GET['delete'];
     try {
-        // Prevent admin from deleting themselves
         if ($user_id == $_SESSION['user_id']) {
             header("Location: users.php?error=cannot_delete_self");
             exit();
@@ -99,7 +96,7 @@ if (isset($_GET['delete'])) {
                         </thead>
                         <tbody>
                             <?php
-                            $stmt = $conn->query("SELECT id, username, email, role, balance FROM users ORDER BY id DESC");
+                            $stmt = $conn->query("SELECT id, username, email, role, balance FROM users ORDER BY id ASC");
                             while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo "<tr>";
                                 echo "<td class='py-2 px-4 border-b' style='text-align: center'>{$user['id']}</td>";

@@ -2,45 +2,35 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Get user balance
 $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $balance = $user['balance'];
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $_POST['amount'];
     
-    // Validate amount
     if (!is_numeric($amount) || $amount <= 0) {
         header("Location: recharge.php?error=invalid_amount");
         exit();
     }
     
     try {
-        // Update user balance
+        
         $stmt = $conn->prepare("UPDATE users SET balance = balance + :amount WHERE id = :id");
         $stmt->bindParam(':amount', $amount);
         $stmt->bindParam(':id', $_SESSION['user_id']);
         $stmt->execute();
         
-        // Record transaction
-        $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, type, description) 
-                               VALUES (:user_id, :amount, 'credit', 'Account recharge')");
-        $stmt->bindParam(':user_id', $_SESSION['user_id']);
-        $stmt->bindParam(':amount', $amount);
-        $stmt->execute();
-        
         header("Location: recharge.php?success=recharge_completed");
         exit();
+        
     } catch(PDOException $e) {
         header("Location: recharge.php?error=recharge_failed");
         exit();

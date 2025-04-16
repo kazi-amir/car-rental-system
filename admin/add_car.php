@@ -2,13 +2,11 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $make = $_POST['make'];
     $model = $_POST['model'];

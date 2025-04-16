@@ -1,5 +1,4 @@
 <?php
-// Common head section for all pages
 require_once 'session_manager.php';
 startSecureSession();
 ?>

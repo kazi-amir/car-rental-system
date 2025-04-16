@@ -3,13 +3,11 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Check if car ID is provided
 if (!isset($_GET['id'])) {
     header("Location: cars.php");
     exit();
@@ -17,7 +15,6 @@ if (!isset($_GET['id'])) {
 
 $car_id = $_GET['id'];
 
-// Get car details
 $stmt = $conn->prepare("SELECT * FROM cars WHERE id = :id");
 $stmt->bindParam(':id', $car_id);
 $stmt->execute();
@@ -28,9 +25,8 @@ if (!$car) {
     exit();
 }
 
-// Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate and update car details
+    
     $make = trim($_POST['make']);
     $model = trim($_POST['model']);
     $year = (int)$_POST['year'];

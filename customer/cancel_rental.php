@@ -3,13 +3,11 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Check if rental ID is provided
 if (!isset($_GET['id'])) {
     file_put_contents('debug.log', "No rental ID provided\n", FILE_APPEND);
     header("Location: my_rentals.php?error=no_rental_id");
@@ -18,12 +16,12 @@ if (!isset($_GET['id'])) {
 
 $rental_id = $_GET['id'];
 
-// Get rental details
 $stmt = $conn->prepare("
-    SELECT r.*, c.make, c.model, c.price_per_day
+    SELECT r.id, r.user_id, r.car_id, r.start_date, r.end_date, r.total_price, r.status,
+        c.make, c.model, c.price_per_day
     FROM rentals r
-    JOIN cars c ON r.car_id = c.id
-    WHERE r.id = :id AND r.user_id = :user_id AND r.status = 'active'
+    INNER JOIN cars c ON r.car_id=c.id
+    WHERE r.id=:id AND r.user_id=:user_id AND r.status='active'
 ");
 $stmt->bindParam(':id', $rental_id);
 $stmt->bindParam(':user_id', $_SESSION['user_id']);
@@ -35,85 +33,50 @@ if (!$rental) {
     exit();
 }
 
-// Calculate refund amount (50% of remaining days)
 $start = new DateTime($rental['start_date']);
 $end = new DateTime($rental['end_date']);
 $today = new DateTime();
 if ($today > $end) {
     $remaining_days = 0;
-} elseif ($today < $start) {
-    // If cancellation before rental start, refund full rental days
+} 
+elseif ($today < $start) {
     $remaining_days = $start->diff($end)->days + 1;
-} else {
-    // Cancellation during rental period, refund remaining days including today
+} 
+else {
     $remaining_days = $today->diff($end)->days + 1;
 }
 $refund_amount = max(0, $remaining_days) * $rental['price_per_day'] * 0.5;
 
-// Process cancellation
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Start transaction
         $conn->beginTransaction();
         
-        // Update rental status only if active
         $stmt = $conn->prepare("UPDATE rentals SET status = 'cancelled' WHERE id = :id AND status = 'active'");
         $stmt->bindParam(':id', $rental_id);
         $stmt->execute();
         
         if ($stmt->rowCount() === 0) {
-            // No rows updated, rental might not be active
+            
             throw new Exception("Rental is not active or already cancelled.");
         }
         
-        // Make car available again
         $stmt = $conn->prepare("UPDATE cars SET available = TRUE WHERE id = :car_id");
         $stmt->bindParam(':car_id', $rental['car_id']);
         $stmt->execute();
         
-        // Refund to user balance only if refund amount > 0
         if ($refund_amount > 0) {
             $stmt = $conn->prepare("UPDATE users SET balance = balance + :amount WHERE id = :user_id");
             $stmt->bindParam(':amount', $refund_amount);
             $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
-            
-            // Record transaction
-            $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, type, description) 
-                                   VALUES (:user_id, :amount, 'credit', 'Rental cancellation refund')");
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
-            $stmt->bindParam(':amount', $refund_amount);
-            $stmt->execute();
+
         }
         
-        // Commit transaction
         $conn->commit();
         
-        // Send email notification
-        $user_stmt = $conn->prepare("SELECT email, username FROM users WHERE id = :user_id");
-        $user_stmt->bindParam(':user_id', $_SESSION['user_id']);
-        $user_stmt->execute();
-        $user = $user_stmt->fetch();
-        
-        $to = $user['email'];
-        $subject = "Your Rental #$rental_id Has Been Cancelled";
-        $message = "
-            <h2>Rental Cancellation Confirmation</h2>
-            <p>Hello {$user['username']},</p>
-            <p>Your rental #$rental_id has been successfully cancelled.</p>
-            <p><strong>Refund Amount:</strong> $" . number_format($refund_amount, 2) . "</p>
-            <p>The refund has been credited to your account balance.</p>
-            <p>Thank you for using our service.</p>
-        ";
-        
-        $headers = "MIME-Version: 1.0\r\n";
-        $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-        $headers .= "From: no-reply@carrentalsystem.com\r\n";
-        
-        mail($to, $subject, $message, $headers);
-        
-        header("Location: my_rentals.php?success=rental_cancelled&refund=" . urlencode(number_format($refund_amount, 2)));
+        header("Location: my_rentals.php?success=rental_cancelled&refunded");
         exit();
+
     } catch(Exception $e) {
         $conn->rollBack();
         file_put_contents('debug.log', "Cancellation failed: " . $e->getMessage() . "\n", FILE_APPEND);

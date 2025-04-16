@@ -3,7 +3,6 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
@@ -80,7 +79,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             <p class="text-gray-500">Total Cars</p>
                             <h3 class="text-2xl font-bold">
                                 <?php 
-                                    $stmt = $conn->query("SELECT COUNT(*) FROM cars");
+                                    $stmt = $conn->query("SELECT COUNT(id) FROM cars");
                                     echo $stmt->fetchColumn();
                                 ?>
                             </h3>
@@ -94,7 +93,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             <p class="text-gray-500">Total Users</p>
                             <h3 class="text-2xl font-bold">
                                 <?php 
-                                    $stmt = $conn->query("SELECT COUNT(*) FROM users");
+                                    $stmt = $conn->query("SELECT COUNT(id) FROM users");
                                     echo $stmt->fetchColumn();
                                 ?>
                             </h3>
@@ -108,7 +107,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             <p class="text-gray-500">Active Rentals</p>
                             <h3 class="text-2xl font-bold">
                                 <?php 
-                                    $stmt = $conn->query("SELECT COUNT(*) FROM rentals WHERE status = 'active'");
+                                    $stmt = $conn->query("SELECT COUNT(id) FROM rentals WHERE status = 'active'");
                                     echo $stmt->fetchColumn();
                                 ?>
                             </h3>
@@ -137,7 +136,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                             <?php
                             $stmt = $conn->query("
                                 SELECT r.id, u.username, CONCAT(c.make, ' ', c.model) AS car, 
-                                       r.start_date, r.end_date, r.total_price, r.status
+                                    r.start_date, r.end_date, r.total_price, r.status
                                 FROM rentals r
                                 JOIN users u ON r.user_id = u.id
                                 JOIN cars c ON r.car_id = c.id

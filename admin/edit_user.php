@@ -3,13 +3,11 @@ require_once '../includes/session_manager.php';
 startSecureSession();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// Check if user ID is provided
 if (!isset($_GET['id'])) {
     header("Location: users.php");
     exit();
@@ -17,7 +15,6 @@ if (!isset($_GET['id'])) {
 
 $user_id = $_GET['id'];
 
-// Get user details
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = :id");
 $stmt->bindParam(':id', $user_id);
 $stmt->execute();
@@ -28,14 +25,12 @@ if (!$user) {
     exit();
 }
 
-// Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $role = trim($_POST['role']);
     $balance = floatval($_POST['balance']);
 
-    // Basic validation
     if (empty($username) || empty($email) || empty($role)) {
         $error = "Please fill in all required fields.";
     } else {

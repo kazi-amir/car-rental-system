@@ -2,13 +2,11 @@
 session_start();
 require_once '../includes/db_connect.php';
 
-// Check if user is logged in and is customer
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
     exit();
 }
 
-// Get user balance
 $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id']);
 $stmt->execute();
@@ -63,7 +61,6 @@ $balance = $user['balance'];
                             echo '<p class="mt-2 text-lg font-bold">$' . number_format($car['price_per_day'], 2) . '<span class="text-sm font-normal text-gray-600"> / day</span></p>';
                             echo '<div class="mt-4 flex justify-between items-center">';
                             echo '<a href="rent_car.php?id=' . $car['id'] . '" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">Rent Now</a>';
-                            echo '<a href="car_details.php?id=' . $car['id'] . '" class="text-blue-500 hover:underline">Details</a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
