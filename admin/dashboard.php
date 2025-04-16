@@ -23,7 +23,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
         <div class="bg-blue-800 text-white w-64 p-4">
             <div class="flex items-center space-x-2 mb-8">
                 <i class="fas fa-car text-2xl"></i>
-                <h1 class="text-xl font-bold">Car Rental Admin</h1>
+                <a href="../admin/dashboard.php"><h1 class="text-xl font-bold">Car Rental Admin</h1></a>
             </div>
             <nav>
                 <ul class="space-y-2">
