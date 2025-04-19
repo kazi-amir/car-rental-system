@@ -48,23 +48,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $conn->beginTransaction();
         
-        $stmt = $conn->prepare("INSERT INTO rentals (user_id, car_id, start_date, end_date, total_price) 
-                               VALUES (:user_id, :car_id, :start_date, :end_date, :total_price)");
+        //With Database Procedure
+        $stmt = $conn->prepare("CALL sell_car(:user_id, :car_id, :start_date, :end_date, :total_price)");
         $stmt->bindParam(':user_id', $_SESSION['user_id']);
         $stmt->bindParam(':car_id', $car_id);
         $stmt->bindParam(':start_date', $start_date);
         $stmt->bindParam(':end_date', $end_date);
         $stmt->bindParam(':total_price', $total_price);
         $stmt->execute();
+
+        //Without Database Procedure
+        // $stmt = $conn->prepare("INSERT INTO rentals (user_id, car_id, start_date, end_date, total_price) 
+        //                        VALUES (:user_id, :car_id, :start_date, :end_date, :total_price)");
+        // $stmt->bindParam(':user_id', $_SESSION['user_id']);
+        // $stmt->bindParam(':car_id', $car_id);
+        // $stmt->bindParam(':start_date', $start_date);
+        // $stmt->bindParam(':end_date', $end_date);
+        // $stmt->bindParam(':total_price', $total_price);
+        // $stmt->execute();
         
-        $stmt = $conn->prepare("UPDATE cars SET available = FALSE WHERE id = :id");
-        $stmt->bindParam(':id', $car_id);
-        $stmt->execute();
+        // $stmt = $conn->prepare("UPDATE cars SET available = FALSE WHERE id = :id");
+        // $stmt->bindParam(':id', $car_id);
+        // $stmt->execute();
         
-        $stmt = $conn->prepare("UPDATE users SET balance = balance - :amount WHERE id = :id");
-        $stmt->bindParam(':amount', $total_price);
-        $stmt->bindParam(':id', $_SESSION['user_id']);
-        $stmt->execute();
+        // $stmt = $conn->prepare("UPDATE users SET balance = balance - :amount WHERE id = :id");
+        // $stmt->bindParam(':amount', $total_price);
+        // $stmt->bindParam(':id', $_SESSION['user_id']);
+        // $stmt->execute();
         
         $conn->commit();
         
